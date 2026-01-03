@@ -1,0 +1,163 @@
+// *** Battle actions for the djinni Afaaq in health-protective mode ***
+
+// Cast protective spells if necessary
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  !StateCheck(Myself, STATE_MIRRORIMAGE)
+  See([EVILCUTOFF])
+  HPPercentLT(Myself, 50)
+  HPPercentGT(Myself, 9)
+  HaveSpell(WIZARD_MIRROR_IMAGE)
+THEN RESPONSE #100
+  Spell(Myself, WIZARD_MIRROR_IMAGE)
+END
+
+
+// Use antidote potions when poisoned
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  HasItem("POTN17", Myself)
+  !GlobalTimerNotExpired("PotionUsedTimer", "LOCALS")
+  OR(2)
+    StateCheck(Myself, STATE_POISONED)
+    StateCheck(Myself, STATE_DISEASED)
+THEN RESPONSE #100
+  SetGlobalTimer("PotionUsedTimer", "LOCALS", 6)
+  DisplayString(Myself, @200)    // quaffs a potion
+  UseItem("POTN17", Myself)
+END
+
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  HasItem("POTN20", Myself)
+  !GlobalTimerNotExpired("PotionUsedTimer", "LOCALS")
+  StateCheck(Myself, STATE_POISONED)
+THEN RESPONSE #50
+  SetGlobalTimer("PotionUsedTimer", "LOCALS", 6)
+  DisplayString(Myself, @200)    // quaffs a potion
+  UseItem("POTN20", Myself)
+END
+
+// Use healing potions when wounded
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  ActuallyInCombat()
+  HasItem("POTN55", Myself)
+  !GlobalTimerNotExpired("PotionUsedTimer", "LOCALS")
+  HPPercentLT(Myself, 34)
+THEN RESPONSE #100
+  SetGlobalTimer("PotionUsedTimer", "LOCALS", 6)
+  DisplayString(Myself, @200)    // quaffs a potion
+  UseItem("POTN55", Myself)
+END
+
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  ActuallyInCombat()
+  HasItem("%itm_potn52%", Myself)
+  !GlobalTimerNotExpired("PotionUsedTimer", "LOCALS")
+  HPPercentLT(Myself, 34)
+THEN RESPONSE #100
+  SetGlobalTimer("PotionUsedTimer", "LOCALS", 6)
+  DisplayString(Myself, @200)    // quaffs a potion
+  UseItem("%itm_potn52%", Myself)
+END
+
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  ActuallyInCombat()
+  HasItem("POTN08", Myself)
+  !GlobalTimerNotExpired("PotionUsedTimer", "LOCALS")
+  HPPercentLT(Myself, 34)
+THEN RESPONSE #100
+  SetGlobalTimer("PotionUsedTimer", "LOCALS", 6)
+  DisplayString(Myself, @200)    // quaffs a potion
+  UseItem("POTN08", Myself)
+END
+
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  ActuallyInCombat()
+  HasItem("%itm_potn52%", Myself)
+  !GlobalTimerNotExpired("PotionUsedTimer", "LOCALS")
+  HPPercentLT(Myself, 50)
+  RandomNum(2, 1)
+THEN  RESPONSE #100
+  SetGlobalTimer("PotionUsedTimer", "LOCALS", 6)
+  DisplayString(Myself, @200)    // quaffs a potion
+  UseItem("%itm_potn52%", Myself)
+END
+
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  ActuallyInCombat()
+  HasItem("POTN08", Myself)
+  !GlobalTimerNotExpired("PotionUsedTimer", "LOCALS")
+  HPPercentLT(Myself, 50)
+  RandomNumGT(4, 1)
+THEN RESPONSE #100
+  SetGlobalTimer("PotionUsedTimer", "LOCALS", 6)
+  DisplayString(Myself, @200)    // quaffs a potion
+  UseItem("POTN08", Myself)
+END
+
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  ActuallyInCombat()
+  HasItem("POTN08", Myself)
+  !GlobalTimerNotExpired("PotionUsedTimer", "LOCALS")
+  HPPercentLT(Myself, 67)
+  RandomNum(4, 1)
+THEN RESPONSE #100
+  SetGlobalTimer("PotionUsedTimer", "LOCALS", 6)
+  DisplayString(Myself, @200)    // quaffs a potion
+  UseItem("POTN08", Myself)
+END
+
+// When hurt then do some protective actions
+IF
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  See([EVILCUTOFF])
+  HPPercentLT(Myself, 33)
+  HPPercentGT(Myself, 9)
+  Global("hurt33", "LOCALS", 0)
+THEN
+  RESPONSE #90    // hide and run
+    SetGlobal("hurt33", "LOCALS", 1)
+    ClearActions(Myself)
+    SpellRES("A7SPIN1", Myself)
+    Wait(1)
+    RunAwayFrom(LastAttackerOf(Myself), 120)
+  RESPONSE #10    // run only
+    SetGlobal("hurt33", "LOCALS", 1)
+    ClearActions(Myself)
+    DisplayStringHead(Myself, @60000)    // Ahh, no! Help me!
+    RunAwayFrom(LastAttackerOf(Myself), 120)
+END
+
+// Improved Afaaq keeps himself hasted
+IF
+  ActionListEmpty()
+  Global("A7AfaaqUpgraded", "GLOBAL", 1)
+  Global("A7AfaaqGaseous", "GLOBAL", 0)
+  Global("AfaaqActiveHaste", "LOCALS", 1)
+  !StateCheck(Myself, CD_STATE_NOTVALID)
+  !StateCheck(Myself, STATE_HASTED)
+  CheckStat(Myself, 0, IMPROVEDHASTE)
+  HaveSpellRES("A7SPIN3") // Haste
+THEN
+  RESPONSE #100
+    SpellRES("A7SPIN3", Myself) // Haste
+    Continue()
+END
+
